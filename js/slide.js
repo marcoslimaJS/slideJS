@@ -2,21 +2,34 @@ export default class Slide {
   constructor(slide, wrapper) {
     this.slide = document.querySelector(slide);
     this.wrapper = document.querySelector(wrapper);
+    this.dist = { finalPosition: 0, startX: 0, movement: 0 }
+  }
+
+  moveSlide(distX) {
+    this.dist.movePosition = distX;
+    this.slide.style.transform = `translate3d(${distX}px, 0, 0)`;
+  }
+
+  uptadePosition(clientX) {
+    this.dist.movement = (this.dist.startX - clientX) * 1.6;
+    return this.dist.finalPosition - this.dist.movement;
   }
 
   onStart(e) {
     e.preventDefault();
+    this.dist.startX = e.clientX;
     this.wrapper.addEventListener('mousemove', this.onMove);
-    console.log('mousedown');
+    
   }
 
   onMove(e) {
-    console.log('moveu')
+    const finalPosition = this.uptadePosition(e.clientX);
+    this.moveSlide(finalPosition);
   }
 
   onEnd(e) {
-    console.log('acabou')
     this.wrapper.removeEventListener('mousemove', this.onMove);
+    this.dist.finalPosition = this.dist.movePosition;
   }
 
   addSlideEvent() {
