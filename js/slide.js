@@ -68,9 +68,52 @@ export default class Slide {
     this.onEnd = this.onEnd.bind(this);
   }
 
+  //  Slides Config
+
+  /*  calculo para centralizar imagem,
+  pega o tamanho do width da tela(nesse caso o wrapper)
+  e subtrai pelo tamanho da imagem, o que sobra são as margins.
+  retorna o offsetLeft da imagem - uma das margins para centralizar
+  */
+  slidePosition(slide) {
+    const margin = (this.wrapper.offsetWidth - slide.offsetWidth) / 2;
+    return -(slide.offsetLeft - margin);
+  }
+
+  /*  array contendo todas as imgs do slide
+  com os objetos contento o elemento e a posição do mesmo ja centralizada com a func slidePosition
+  */
+  slidesConfig() {
+    this.slideArray = [...this.slide.children].map((element) => {
+      const position = this.slidePosition(element);
+      return { position, element }
+    });
+  }
+
+  //  objeto para pegar o index do array de slide, atual, anterior e proximo
+  slideIndexNav(index) {
+    const last = this.slideArray.length -1;
+    this.index = {
+      prev: index ? index - 1 : undefined,
+      active: index,
+      next: index === last ? undefined : index + 1
+    }
+  }
+
+  //  mudar slide de acordo com index passado
+  changeSlide(index) {
+    const activeSlide = this.slideArray[index]
+    this.moveSlide(activeSlide.position);
+    this.slideIndexNav(index);
+    // atualizar distancia, para na voltar ao inicio (0)
+    // se não no proximo click no slide a posição final(this.dist.finalPosition) iniciara com 0
+    this.dist.finalPosition = activeSlide.position;
+  }
+
   init() {
     this.bindEvents();
     this.addSlideEvent();
+    this.slidesConfig();
     return this
   }
 }
