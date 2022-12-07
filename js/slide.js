@@ -1,3 +1,5 @@
+import debounce from './debouce.js';
+
 export default class Slide {
   constructor(slide, wrapper) {
     this.slide = document.querySelector(slide);
@@ -76,13 +78,6 @@ export default class Slide {
     this.wrapper.addEventListener('touchend', this.onEnd);
   }
 
-  //  faz o bind para que a classe Slide seja o this nos callbacks
-  bindEvents() {
-    this.onStart = this.onStart.bind(this);
-    this.onMove = this.onMove.bind(this);
-    this.onEnd = this.onEnd.bind(this);
-  }
-
   //  Slides Config
 
   /*  calculo para centralizar imagem,
@@ -123,18 +118,43 @@ export default class Slide {
     // atualizar distancia, para na voltar ao inicio (0)
     // se não no proximo click no slide a posição final(this.dist.finalPosition) iniciara com 0
     this.dist.finalPosition = activeSlide.position;
+    this.changeActiveClass();
+  }
+
+  changeActiveClass() {
+    this.slideArray.forEach((item) => item.element.classList.remove('active'))
+    this.slideArray[this.index.active].element.classList.add('active');
   }
 
   activePrevSlide() {
     if (this.index.prev !== undefined) {
-      this.changeSlide(this.index.prev)
+      this.changeSlide(this.index.prev);
     }
   }
 
   activeNextSlide() {
     if (this.index.next !== undefined) {
-      this.changeSlide(this.index.next)
+      this.changeSlide(this.index.next);
     }
+  }
+
+  onResize() {
+    setTimeout(() => {
+      this.slidesConfig();
+      this.changeSlide(this.index.active);
+    }, 1000)
+  }
+
+  addResizeEvent() {
+    window.addEventListener('resize', this.onResize);
+  }
+
+   //  faz o bind para que a classe Slide seja o this nos callbacks
+   bindEvents() {
+    this.onStart = this.onStart.bind(this);
+    this.onMove = this.onMove.bind(this);
+    this.onEnd = this.onEnd.bind(this);
+    this.onResize = debounce(this.onResize.bind(this), 200);
   }
 
   init() {
@@ -142,6 +162,7 @@ export default class Slide {
     this.transition(true);
     this.addSlideEvent();
     this.slidesConfig();
+    this.addResizeEvent();
     return this
   }
 }
