@@ -70,6 +70,8 @@ export class Slide {
       this.activeNextSlide();
     } else if (this.dist.movement < 120 && this.index.prev !== undefined) {
       this.activePrevSlide();
+    } else {
+      this.changeSlide(this.index.active);
     }
   }
 
